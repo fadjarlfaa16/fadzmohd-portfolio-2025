@@ -8,6 +8,7 @@ const Moon: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
+  console.log(rotation);
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       const { clientX, clientY } = event;
@@ -21,14 +22,11 @@ const Moon: React.FC = () => {
       const { beta, gamma } = event;
       if (beta === null || gamma === null) return;
 
-      // Adjust beta to be 0 when device is upright
       const adjustedBeta = beta - 90;
 
-      // Clamp values between -45 and 45 degrees
       const clampedBeta = Math.min(Math.max(adjustedBeta, -45), 45);
       const clampedGamma = Math.min(Math.max(gamma, -45), 45);
 
-      // Calculate position offsets with same sensitivity as mouse
       const xOffset = (-clampedGamma / 45) * 0.5;
       const yOffset = (clampedBeta / 45) * 0.5;
 
@@ -39,10 +37,8 @@ const Moon: React.FC = () => {
     const requestPermission = () => {
       if (
         typeof DeviceOrientationEvent !== "undefined" &&
-        // @ts-ignore: iOS specific method
         (DeviceOrientationEvent as any).requestPermission
       ) {
-        // @ts-ignore: iOS specific method
         (DeviceOrientationEvent as any)
           .requestPermission()
           .then((response: string) => {
