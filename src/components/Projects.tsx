@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ArrowRight, Github, WebhookIcon } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Github } from "lucide-react";
 import Legalhelp1 from "../assets//legalhelp1.png";
 import Legalhelp2 from "../assets//legalhelp2.png";
 import Legalhelp3 from "../assets//legalhelp3.png";

@@ -8,6 +8,7 @@ const Moon: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
+  console.log(rotation);
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       const { clientX, clientY } = event;
