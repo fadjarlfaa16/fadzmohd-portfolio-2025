@@ -8,7 +8,6 @@ const Moon: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
-  console.log(rotation);
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       const { clientX, clientY } = event;
@@ -18,20 +17,55 @@ const Moon: React.FC = () => {
       setRotation({ x: yOffset * 0.5, y: xOffset * 0.5 });
     };
 
-    const handleDeviceMotion = (event: DeviceMotionEvent) => {
-      if (event.rotationRate) {
-        setPosition({
-          x: event.rotationRate.gamma ? -event.rotationRate.gamma / 90 : 0,
-          y: event.rotationRate.beta ? event.rotationRate.beta / 90 : 0,
-        });
+    const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+      const { beta, gamma } = event;
+      if (beta === null || gamma === null) return;
+
+      // Adjust beta to be 0 when device is upright
+      const adjustedBeta = beta - 90;
+
+      // Clamp values between -45 and 45 degrees
+      const clampedBeta = Math.min(Math.max(adjustedBeta, -45), 45);
+      const clampedGamma = Math.min(Math.max(gamma, -45), 45);
+
+      // Calculate position offsets with same sensitivity as mouse
+      const xOffset = (-clampedGamma / 45) * 0.5;
+      const yOffset = (clampedBeta / 45) * 0.5;
+
+      setPosition({ x: xOffset, y: yOffset });
+      setRotation({ x: yOffset * 0.5, y: xOffset * 0.5 });
+    };
+
+    const requestPermission = () => {
+      if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        // @ts-ignore: iOS specific method
+        (DeviceOrientationEvent as any).requestPermission
+      ) {
+        // @ts-ignore: iOS specific method
+        (DeviceOrientationEvent as any)
+          .requestPermission()
+          .then((response: string) => {
+            if (response === "granted") {
+              window.addEventListener(
+                "deviceorientation",
+                handleDeviceOrientation
+              );
+            }
+          })
+          .catch(console.error);
+      } else {
+        window.addEventListener("deviceorientation", handleDeviceOrientation);
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("devicemotion", handleDeviceMotion);
+    window.addEventListener("touchstart", requestPermission, { once: true });
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("devicemotion", handleDeviceMotion);
+      window.removeEventListener("deviceorientation", handleDeviceOrientation);
+      window.removeEventListener("touchstart", requestPermission);
     };
   }, []);
 
